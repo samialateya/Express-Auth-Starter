@@ -29,6 +29,13 @@ class PGClient {
 			}
 		});
 	}
+
+	//*insert record into a table
+	async insertData(table, columns, values) {
+		const query = `INSERT INTO ${table} (${columns}) VALUES (${values})`;
+		const result = await this.#client.query(query);
+		return result
+	}
 }
 
 module.exports = PGClient;
