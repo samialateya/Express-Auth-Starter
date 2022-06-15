@@ -36,6 +36,20 @@ class PGClient {
 		const result = await this.#client.query(query);
 		return result
 	}
+
+	//*fetch data from table
+	async fetchData(table, columns, where, orderBy, limit) {
+		const query = `SELECT ${columns} FROM ${table} ${where} ${orderBy} ${limit}`;
+		const result = await this.#client.query(query);
+		return result
+	}
+
+	//*update a record in a table
+	async updateData(table, columns, where) {
+		const query = `UPDATE ${table} SET ${columns} ${where}`;
+		const result = await this.#client.query(query);
+		resolve(result);
+	}
 }
 
 module.exports = PGClient;

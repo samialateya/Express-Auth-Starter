@@ -18,6 +18,4 @@ const RegisterRequest = [
 	}),
 ];
 
-module.exports = {
-	RegisterRequest,
-}
+module.exports = RegisterRequest;

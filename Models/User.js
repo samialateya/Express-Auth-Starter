@@ -1,5 +1,6 @@
 const PostgresClient = require('../DataBase/PostgresClient');
-const { PasswordHash } = require('../Helpers/Utils');
+const { PasswordHash, PasswordHashMatch } = require('../Helpers/Utils/');
+const { CustomAPIError } = require('../Errors');
 class UserModel {
 	#table = 'users';
 	#fillable = ['email','name','password','is_admin'];
@@ -32,6 +33,27 @@ class UserModel {
 			throw err;
 		}
 	}
+
+	//*authenticate a user with email and password
+	async authenticate(email, password) {
+		const columns = '*';
+		const where = `WHERE email = '${email}'`;
+		const user = await this.#DBClient.fetchData(this.#table, columns, where, '', 'LIMIT 1');
+		//if no user found throw an error
+		if (user.rows.length === 0) throw new CustomAPIError('Invalid Credentials', 401);
+		const userData = user.rows[0];
+		//compare the password hash with the one in the database throw error if not matched
+		const passwordMatch = await PasswordHashMatch(password, userData.password);
+		if (!passwordMatch) throw new CustomAPIError('Invalid Credentials', 401);
+		return userData;
+	}
+
+	//*update refresh token in the database
+	async updateRefreshToken(userID, refreshToken) {
+		const columns = `refresh_token = '${refreshToken}'`;
+		const where = `WHERE id = ${userID}`;
+		await this.#DBClient.updateData(this.#table, columns, where);
+	} 
 }
 
 module.exports = UserModel;
