@@ -1,4 +1,4 @@
-const PostgresClient = require('../DataBase/PostgresClient');
+const PostgresClient = require('../Database/PostgresClient');
 const { PasswordHash, PasswordHashMatch } = require('../Helpers/Utils/PasswordHash');
 const { CustomAPIError } = require('../Errors');
 class UserModel {
