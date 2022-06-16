@@ -1,7 +1,9 @@
 const { ServerError, CustomAPIError } =  require('../Errors');
 const ResultValidation = require('../Requests/ResultValidation');
 const UserModel = require('../Models/User');
-const { CreateAccessToken, CreateRefreshToken } = require('../Helpers/Utils');
+const { CreateAccessToken, CreateRefreshToken } = require('../Helpers/Utils/JWT');
+const { LoginResource } = require('../Resources/Auth');
+
 class AuthController{
 	//#ANCHOR register
 	async register(req, res){
@@ -34,13 +36,12 @@ class AuthController{
 		const user = await new UserModel();
 		//? the authenticate method will throw un authenticated custom error if the credentials are wrong
 		const userData = await user.authenticate(email, password);
-		//TODO create refresh token
+		//*create refresh token
 		const accessToken = CreateAccessToken({id: userData.id, email: userData.email, name: userData.name});
-		//TODO create access token
+		//*create access token
 		const refreshToken = await CreateRefreshToken({id: userData.id});
-		//TODO send the token to the client
-		res.status(200).json({ 'data': userData, 'accessToken': accessToken, 'refreshToken': refreshToken });
-		
+		//*send response to the client with user data and tokens
+		LoginResource(res, { ...userData, accessToken, refreshToken });
 	}
 }
 

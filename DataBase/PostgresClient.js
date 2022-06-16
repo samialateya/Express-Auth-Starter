@@ -48,7 +48,7 @@ class PGClient {
 	async updateData(table, columns, where) {
 		const query = `UPDATE ${table} SET ${columns} ${where}`;
 		const result = await this.#client.query(query);
-		resolve(result);
+		return result
 	}
 }
 

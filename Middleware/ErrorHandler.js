@@ -1,5 +1,5 @@
 const { CustomAPIError } = require('../Errors');
-const { ParseJSON } = require('../Helpers/Utils');
+const ParseJSON = require('../Helpers/Utils/ParseJSON');
 
 const ErrorHandlerMiddleware = (err, req, res, next) => {
 	console.log(err);
