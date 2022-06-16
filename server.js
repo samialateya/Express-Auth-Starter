@@ -8,6 +8,9 @@ const { ErrorHandlerMiddleware, NotFoundMiddleware } = require('./Middleware');
 /* --------------------- initialize express application --------------------- */
 const app = express();
 
+/* ---------------------------- set static folder --------------------------- */
+app.use('/profile',express.static('public/assets/profile'));
+
 /* --------------------------- register the routes -------------------------- */
 const authRoutes = require('./routes/AuthRoutes');
 app.use('/auth',authRoutes);

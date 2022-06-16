@@ -4,6 +4,7 @@ const { CustomAPIError } = require('../Errors');
 class UserModel {
 	#table = 'users';
 	#fillable = ['email','name','password','is_admin'];
+	#defaultAvatarLink = '/profile/default.svg';
 	#DBClient;
 	//?connect to the database and return the postgres db client object
 	constructor() {
@@ -39,12 +40,17 @@ class UserModel {
 		const columns = '*';
 		const where = `WHERE email = '${email}'`;
 		const user = await this.#DBClient.fetchData(this.#table, columns, where, '', 'LIMIT 1');
-		//if no user found throw an error
+		//?if no user found throw an error
 		if (user.rows.length === 0) throw new CustomAPIError('Invalid Credentials', 401);
 		const userData = user.rows[0];
-		//compare the password hash with the one in the database throw error if not matched
+		//?compare the password hash with the one in the database throw error if not matched
 		const passwordMatch = await PasswordHashMatch(password, userData.password);
 		if (!passwordMatch) throw new CustomAPIError('Invalid Credentials', 401);
+		//?check if user is blocked
+		if (!userData.is_active) throw new CustomAPIError('User is blocked', 401);
+		//?append default avatar link if the user dose not have one
+		if (!userData.avatar_link) userData.avatar_link = this.#defaultAvatarLink;
+		//*return user data
 		return userData;
 	}
 

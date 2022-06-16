@@ -41,7 +41,7 @@ class AuthController{
 		//*create access token
 		const refreshToken = await CreateRefreshToken({id: userData.id});
 		//*send response to the client with user data and tokens
-		LoginResource(res, { ...userData, accessToken, refreshToken });
+		LoginResource(req, res, { ...userData, accessToken, refreshToken });
 	}
 }
 
