@@ -5,6 +5,8 @@ const router = express.Router();
 const AuthController = require('../controllers/AuthController');
 //require from validation
 const { RegisterRequest, LoginRequest } = require('../Requests/Auth');
+//require middleware
+const { UserAuth } = require('../Middleware/Authentication');
 
 
 /* ---------------------- add middleware to the routes ---------------------- */
@@ -19,5 +21,8 @@ const authController = new AuthController();
 router.route('/register').post(RegisterRequest, authController.register);
 //#ANCHOR login
 router.route('/login').post(LoginRequest, authController.login);
+//#ANCHOR logout
+//add user authentication middleware
+router.route('/logout').post(UserAuth,authController.logout);
 
 module.exports = router;

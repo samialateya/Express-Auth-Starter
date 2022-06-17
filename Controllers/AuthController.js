@@ -43,6 +43,15 @@ class AuthController{
 		//*send response to the client with user data and tokens
 		LoginResource(req, res, { ...userData, accessToken, refreshToken });
 	}
+
+	//#ANCHOR logout
+	async logout(req, res){
+		//*delete the refresh token from the database
+		const user = await new UserModel();
+		await user.updateRefreshToken(req.user.id, '');
+		//*send response to the client
+		res.status(200).json({ 'message': 'Logout Successfully' });
+	}
 }
 
 module.exports = AuthController;

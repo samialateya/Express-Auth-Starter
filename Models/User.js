@@ -38,7 +38,7 @@ class UserModel {
 	//*authenticate a user with email and password
 	async authenticate(email, password) {
 		const columns = '*';
-		const where = `WHERE email = '${email}'`;
+		const where = `WHERE email = '${email}' AND is_admin = false`;
 		const user = await this.#DBClient.fetchData(this.#table, columns, where, '', 'LIMIT 1');
 		//?if no user found throw an error
 		if (user.rows.length === 0) throw new CustomAPIError('Invalid Credentials', 401);
