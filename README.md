@@ -39,8 +39,10 @@ cp .env.example .env
 
 
 <b>
-	Update your ENV file with the email driver credentials<br>
-	and social login keys
+	- Update your ENV file with the email driver credentials and social login keys
+</b><br>
+<b>
+	- Find the API Requests Samples in ./requests.rest file
 </b><br></br>
 
 ## Database
