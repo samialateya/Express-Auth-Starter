@@ -1,8 +1,9 @@
-const { ServerError, CustomAPIError } =  require('../Errors');
+const { ServerError, CustomAPIError, NotFoundError } =  require('../Errors');
 const ResultValidation = require('../Requests/ResultValidation');
 const UserModel = require('../Models/User');
 const { CreateAccessToken, CreateRefreshToken } = require('../Helpers/Utils/JWT');
 const { LoginResource } = require('../Resources/Auth');
+const { SendEmailVerificationEvent } = require('../Events');
 
 class AuthController{
 	//#ANCHOR register
@@ -51,6 +52,25 @@ class AuthController{
 		await user.updateRefreshToken(req.user.id, '');
 		//*send response to the client
 		res.status(200).json({ 'message': 'Logout Successfully' });
+	}
+
+	//#ANCHOR Send verification email
+	async sendVerificationEmail(req, res){
+		//?return error if the form validation failed
+		ResultValidation(req);
+		//catch request data
+		const { email } = req.body;
+		//find a user by email
+		const user = await new UserModel();
+		const userData = await user.findUser('email', email);
+		//?if user not found
+		if (!userData) {
+			throw new NotFoundError('User not found');
+		}
+		//?send verification email
+		const emailVerificationEvent = new SendEmailVerificationEvent(userData);
+		await emailVerificationEvent.send(userData);
+		return res.status(200).json({ 'message': 'Verification Email Sent Successfully' });
 	}
 }
 

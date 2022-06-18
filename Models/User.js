@@ -59,7 +59,22 @@ class UserModel {
 		const columns = `refresh_token = '${refreshToken}'`;
 		const where = `WHERE id = ${userID}`;
 		await this.#DBClient.updateData(this.#table, columns, where);
-	} 
+	}
+
+	//*update  verify token
+	async updateVerificationToken(userID, verificationToken) {
+		const columns = `verification_token = '${verificationToken}'`;
+		const where = `WHERE id = ${userID}`;
+		await this.#DBClient.updateData(this.#table, columns, where);
+	}
+
+	//*find user data by key
+	async findUser(key, value) {
+		const columns = '*';
+		const where = `WHERE ${key} = '${value}'`;
+		const user = await this.#DBClient.fetchData(this.#table, columns, where, '', 'LIMIT 1');
+		return user.rows[0];
+	}
 }
 
 module.exports = UserModel;
