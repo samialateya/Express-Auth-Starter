@@ -43,7 +43,7 @@ cp .env.example .env
 </b><br>
 <b>
 	- Find the API Requests Samples in ./requests.rest file
-</b><br></br>
+</b><br><br>
 
 ## Database
 ```
@@ -52,7 +52,7 @@ find the SQL dump on ./database/postgres.sql
 ```
 <b>
 	create new database and pass the database credentials to the env file.
-</b><br></br>
+</b><br><br>
 
 ## Contributing
 
