@@ -13,6 +13,20 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-	"email": "sami@test.com",
+	"email": "samialateya@hotmail.com",
 	"password": "112233"
+}
+
+
+###
+POST http://localhost:3000/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExIiwiZW1haWwiOiJzYW1pYWxhdGV5YUBob3RtYWlsLmNvbSIsIm5hbWUiOiJzYW1pIiwiaWF0IjoxNjU1NTg5OTE5LCJleHAiOjE2NTU1OTM1MTl9.ZV3Xk_QUtKvPoXZ1fxySuhZWX342gCvua5li1M-ZcYI
+
+
+###
+POST http://localhost:3000/auth/email-verification/send
+Content-Type: application/json
+
+{
+	"email": "samialateya@hotmail.com"
 }
