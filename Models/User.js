@@ -64,8 +64,10 @@ class UserModel {
 	}
 
 	//*update  verify token
-	async updateVerificationToken(userID, verificationToken, emailVerifiedAt = null) {
-		const columns = `verification_token = '${verificationToken}' , email_verified_at = '${emailVerifiedAt}'`;
+	async updateVerificationToken(userID, verificationToken, emailVerifiedAt) {
+		let columns = `verification_token = '${verificationToken}' `;
+		//?set the email verified at to current time if it is been passed as a parameter
+		emailVerifiedAt ? columns += `, email_verified_at = '${ emailVerifiedAt }'` : '';
 		const where = `WHERE id = ${userID}`;
 		await this.#DBClient.updateData(this.#table, columns, where);
 	}
