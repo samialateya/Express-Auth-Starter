@@ -25,5 +25,7 @@ router.route('/login').post(LoginRequest, authController.login);
 router.route('/logout').post(UserAuth ,authController.logout);
 //#ANCHOR Send verification email
 router.route('/email-verification/send').post(SendVerificationEmailRequest, authController.sendVerificationEmail);
+//#ANCHOR verify email
+router.route('/email-verification/verify').get(authController.verifyEmail);
 
 module.exports = router;

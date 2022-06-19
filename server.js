@@ -2,6 +2,8 @@
 const express = require('express');
 require('dotenv').config();
 require('express-async-errors');
+const expressLayouts = require('express-ejs-layouts')
+
 //import middleware
 const { ErrorHandlerMiddleware, NotFoundMiddleware } = require('./Middleware');
 
@@ -9,9 +11,15 @@ const { ErrorHandlerMiddleware, NotFoundMiddleware } = require('./Middleware');
 const app = express();
 
 /* ---------------------------- set static folder --------------------------- */
-app.use('/profile',express.static('public/assets/profile'));
+app.use('/profile',express.static(__dirname + '/public/assets/profile'));
+app.use(express.static(__dirname + '/public'));
+
+/* --------------------- set template engine to use ejs --------------------- */
+app.use(expressLayouts)
+app.set('view engine', 'ejs');
 
 /* --------------------------- register the routes -------------------------- */
+//authentication routes
 const authRoutes = require('./routes/AuthRoutes');
 app.use('/auth',authRoutes);
 

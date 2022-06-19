@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const ejs = require('ejs');
 
 class VerificationMailer {
 	#host = process.env.MAIL_HOST;
@@ -7,7 +8,7 @@ class VerificationMailer {
 	#password = process.env.MAIL_PASSWORD;
 	#from = process.env.MAIL_FROM_ADDRESS;
 
-	async send(to, subject, body) {
+	async send(to, subject, verificationLink) {
 		const transporter = nodemailer.createTransport({
 			host: this.#host,
 			port: this.#port,
@@ -17,11 +18,23 @@ class VerificationMailer {
 			},
 		});
 
+		const mailBody = await this.#loadTemplate(verificationLink);
 		return transporter.sendMail({
 			from: this.#from, // sender address
 			to: to, // list of receivers
 			subject: subject,
-			html: body,
+			html: mailBody,
+		});
+	}
+
+	async #loadTemplate(verificationLink) {
+		const templateLink = __dirname + '/../Views/Mail/verification-mail.ejs';
+		return await ejs.renderFile(templateLink, {
+			title: 'Verification Mail',
+			header: 'Email Verification',
+			message: 'Please click the button below to verify your email address.',
+			button: 'Verify Email',
+			link: verificationLink
 		});
 	}
 }
