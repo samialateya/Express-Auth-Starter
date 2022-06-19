@@ -73,7 +73,7 @@ class AuthController {
 		return res.status(200).json({ 'message': 'Verification Email Sent Successfully' });
 	}
 
-	//#anchor verify email
+	//#ANCHOR verify email
 	async verifyEmail(req, res) {
 		//catch the token from the request query params
 		const { token } = req.query;
@@ -81,12 +81,26 @@ class AuthController {
 		if (!token) {
 			throw new CustomAPIError('Token is required', 400);
 		}
-		res.render('Mail/verification-message', {
-			layout: 'Mail/Layouts/simple',
-			title: 'Verification Mail Complete',
-			header: 'Your Email Is Verified',
-			message: 'Your Email Is Verified Successfully Continue To Use Our Services',
-		});
+
+		//verify the token
+		try{
+			const user = await new UserModel();
+			await user.verifyEmail(token);
+			res.render('Mail/verification-message', {
+				layout: 'Mail/Layouts/simple',
+				title: 'Email Verification Complete',
+				header: 'Your Email Is Verified',
+				message: 'Your Email Is Verified Successfully Continue To Use Our Services',
+			});
+		}
+		catch(err){
+			console.log(err);
+			res.render('Errors/403', {
+				layout: 'Errors/Layouts/simple',
+				title: 'Invalid Token',
+				message: 'This Token was expired please enquire for a new one',
+			});
+		}
 	}
 }
 

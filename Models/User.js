@@ -1,6 +1,8 @@
 const PostgresClient = require('../Database/PostgresClient');
 const { PasswordHash, PasswordHashMatch } = require('../Helpers/Utils/PasswordHash');
 const { CustomAPIError } = require('../Errors');
+const jwt = require('jsonwebtoken');
+
 class UserModel {
 	#table = 'users';
 	#fillable = ['email','name','password','is_admin'];
@@ -62,8 +64,8 @@ class UserModel {
 	}
 
 	//*update  verify token
-	async updateVerificationToken(userID, verificationToken) {
-		const columns = `verification_token = '${verificationToken}'`;
+	async updateVerificationToken(userID, verificationToken, emailVerifiedAt = null) {
+		const columns = `verification_token = '${verificationToken}' , email_verified_at = '${emailVerifiedAt}'`;
 		const where = `WHERE id = ${userID}`;
 		await this.#DBClient.updateData(this.#table, columns, where);
 	}
@@ -74,6 +76,22 @@ class UserModel {
 		const where = `WHERE ${key} = '${value}'`;
 		const user = await this.#DBClient.fetchData(this.#table, columns, where, '', 'LIMIT 1');
 		return user.rows[0];
+	}
+
+	//verify user email
+	async verifyEmail(token) {
+		const user = await this.findUser('verification_token', token);
+		//!doesn't matter the type of the error it will be caught in the controller and send the 403 page
+		if (!user) throw "token not found";
+		//?verify the token to make sure it is not expired
+		try{
+			await jwt.verify(token, process.env.EMAIL_VERIFICATION_SECRET);
+			//remove the token and update verified at to current time
+			await this.updateVerificationToken(user.id, '', 'now()');
+		}
+		catch(err){
+			throw "token expired";
+		}
 	}
 }
 
