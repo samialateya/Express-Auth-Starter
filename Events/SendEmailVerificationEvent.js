@@ -24,7 +24,7 @@ class SendEmailVerificationEvent {
 		const token = await jwt.sign({ id: user.id }, process.env.EMAIL_VERIFICATION_SECRET, { expiresIn: '1h' });
 		//*save the token to the database
 		const userModel = await new UserModel();
-		await userModel.updateVerificationToken(user.id, token);
+		await userModel.update(user.id, {verification_token: token});
 		return token;
 	}
 

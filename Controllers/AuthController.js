@@ -3,10 +3,10 @@ const ResultValidation = require('../Requests/ResultValidation');
 const UserModel = require('../Models/User');
 const { CreateAccessToken, CreateRefreshToken } = require('../Helpers/Utils/JWT');
 const { LoginResource } = require('../Resources/Auth');
-const { SendEmailVerificationEvent } = require('../Events');
+const { SendEmailVerificationEvent, SendResetPasswordEvent } = require('../Events');
 
 class AuthController {
-	//#ANCHOR register
+	//ANCHOR register
 	async register(req, res) {
 		//?return error if the form validation failed
 		ResultValidation(req);
@@ -27,7 +27,7 @@ class AuthController {
 		}
 	}
 
-	//#ANCHOR login
+	//ANCHOR login
 	async login(req, res, next) {
 		//?return error if the form validation failed
 		ResultValidation(req);
@@ -45,7 +45,7 @@ class AuthController {
 		LoginResource(req, res, { ...userData, accessToken, refreshToken });
 	}
 
-	//#ANCHOR logout
+	//ANCHOR logout
 	async logout(req, res) {
 		//*delete the refresh token from the database
 		const user = await new UserModel();
@@ -54,7 +54,7 @@ class AuthController {
 		res.status(200).json({ 'message': 'Logout Successfully' });
 	}
 
-	//#ANCHOR Send verification email
+	//ANCHOR Send verification email
 	async sendVerificationEmail(req, res) {
 		//?return error if the form validation failed
 		ResultValidation(req);
@@ -73,7 +73,7 @@ class AuthController {
 		return res.status(200).json({ 'message': 'Verification Email Sent Successfully' });
 	}
 
-	//#ANCHOR verify email
+	//ANCHOR verify email
 	async verifyEmail(req, res) {
 		//catch the token from the request query params
 		const { token } = req.query;
@@ -102,6 +102,27 @@ class AuthController {
 			});
 		}
 	}
+
+	//SECTION reset password functionality
+	//ANCHOR send reset password email
+	async sendResetPasswordEmail(req, res) {
+		//?return error if the form validation failed
+		ResultValidation(req);
+		//catch request data
+		const { email } = req.body;
+		//find a user by email
+		const user = await new UserModel();
+		const userData = await user.findUser('email', email);
+		//?if user not found
+		if (!userData) {
+			throw new NotFoundError('User not found');
+		}
+		//?send reset password email
+		const resetPasswordEvent = new SendResetPasswordEvent(req, userData);
+		await resetPasswordEvent.send();
+		return res.status(200).json({ 'message': 'the reset password link is sent to your email' });
+	}
+	//#!SECTION reset password functionality
 }
 
 module.exports = AuthController;

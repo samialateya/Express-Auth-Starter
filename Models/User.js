@@ -37,6 +37,17 @@ class UserModel {
 		}
 	}
 
+	//*update user data
+	async update(userID, values) {
+		//convert task object to string key = value,
+		//and separate each key/value pair with a comma
+		//values sample: {name: 'John', email: 'john@email.com'}
+		const columns = Object.keys(values).map(key => `${key} = '${values[key]}'`).join(',');
+
+		const where = `WHERE id = ${userID}`;
+		await this.#DBClient.updateData(this.#table, columns, where);
+	}
+
 	//*authenticate a user with email and password
 	async authenticate(email, password) {
 		const columns = '*';
@@ -56,22 +67,6 @@ class UserModel {
 		return userData;
 	}
 
-	//*update refresh token in the database
-	async updateRefreshToken(userID, refreshToken) {
-		const columns = `refresh_token = '${refreshToken}'`;
-		const where = `WHERE id = ${userID}`;
-		await this.#DBClient.updateData(this.#table, columns, where);
-	}
-
-	//*update  verify token
-	async updateVerificationToken(userID, verificationToken, emailVerifiedAt) {
-		let columns = `verification_token = '${verificationToken}' `;
-		//?set the email verified at to current time if it is been passed as a parameter
-		emailVerifiedAt ? columns += `, email_verified_at = '${ emailVerifiedAt }'` : '';
-		const where = `WHERE id = ${userID}`;
-		await this.#DBClient.updateData(this.#table, columns, where);
-	}
-
 	//*find user data by key
 	async findUser(key, value) {
 		const columns = '*';
@@ -80,7 +75,7 @@ class UserModel {
 		return user.rows[0];
 	}
 
-	//verify user email
+	//*verify user email
 	async verifyEmail(token) {
 		const user = await this.findUser('verification_token', token);
 		//!doesn't matter the type of the error it will be caught in the controller and send the 403 page
@@ -89,7 +84,7 @@ class UserModel {
 		try{
 			await jwt.verify(token, process.env.EMAIL_VERIFICATION_SECRET);
 			//remove the token and update verified at to current time
-			await this.updateVerificationToken(user.id, '', 'now()');
+			await this.update(user.id, { verification_token : '', email_verified_at : 'now()' });
 		}
 		catch(err){
 			throw "token expired";

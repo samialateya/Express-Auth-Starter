@@ -17,15 +17,22 @@ router.use(express.urlencoded({extended: true}));
 
 /* ---------------------------- define the routes --------------------------- */
 const authController = new AuthController();
-//#ANCHOR register
+//ANCHOR register
 router.route('/register').post(RegisterRequest, authController.register);
-//#ANCHOR login
+//ANCHOR login
 router.route('/login').post(LoginRequest, authController.login);
-//#ANCHOR logout
+//ANCHOR logout
 router.route('/logout').post(UserAuth ,authController.logout);
-//#ANCHOR Send verification email
+//ANCHOR Send verification email
 router.route('/email-verification/send').post(SendVerificationEmailRequest, authController.sendVerificationEmail);
-//#ANCHOR verify email
+//ANCHOR verify email
 router.route('/email-verification/verify').get(authController.verifyEmail);
+
+//SECTION reset password
+//*send email to reset password
+router.route('/reset-password/send').post(SendVerificationEmailRequest, authController.sendResetPasswordEmail);
+//*verify the token and open update password page
+// router.route('/reset-password/verify').get(authController.verifyResetPassword);
+//#!SECTION reset password
 
 module.exports = router;
