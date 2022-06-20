@@ -4,7 +4,7 @@ const router = express.Router();
 //require authentication controller
 const AuthController = require('../controllers/AuthController');
 //require from validation
-const { RegisterRequest, LoginRequest, SendVerificationEmailRequest } = require('../Requests/Auth');
+const { RegisterRequest, LoginRequest, SendVerificationEmailRequest, ResetPasswordRequest } = require('../Requests/Auth');
 //require middleware
 const { UserAuth } = require('../Middleware/Authentication');
 
@@ -32,7 +32,9 @@ router.route('/email-verification/verify').get(authController.verifyEmail);
 //*send email to reset password
 router.route('/reset-password/send').post(SendVerificationEmailRequest, authController.sendResetPasswordEmail);
 //*verify the token and open update password page
-// router.route('/reset-password/verify').get(authController.verifyResetPassword);
+router.route('/reset-password/verify').get(authController.verifyResetPasswordToken);
+//*update password
+router.route('/reset-password/update').post(ResetPasswordRequest, authController.updatePassword);
 //#!SECTION reset password
 
 module.exports = router;

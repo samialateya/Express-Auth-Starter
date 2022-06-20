@@ -4,6 +4,7 @@ const UserModel = require('../Models/User');
 const { CreateAccessToken, CreateRefreshToken } = require('../Helpers/Utils/JWT');
 const { LoginResource } = require('../Resources/Auth');
 const { SendEmailVerificationEvent, SendResetPasswordEvent } = require('../Events');
+const jwt = require('jsonwebtoken');
 
 class AuthController {
 	//ANCHOR register
@@ -83,7 +84,7 @@ class AuthController {
 		}
 
 		//verify the token
-		try{
+		try {
 			const user = await new UserModel();
 			await user.verifyEmail(token);
 			res.render('Mail/verification-message', {
@@ -93,7 +94,7 @@ class AuthController {
 				message: 'Your Email Is Verified Successfully Continue To Use Our Services',
 			});
 		}
-		catch(err){
+		catch (err) {
 			console.log(err);
 			res.render('Errors/403', {
 				layout: 'Errors/Layouts/simple',
@@ -121,6 +122,57 @@ class AuthController {
 		const resetPasswordEvent = new SendResetPasswordEvent(req, userData);
 		await resetPasswordEvent.send();
 		return res.status(200).json({ 'message': 'the reset password link is sent to your email' });
+	}
+	//ANCHOR verify reset password token and view update password page
+	async verifyResetPasswordToken(req, res) {
+		//catch the token from the request query params
+		const { token } = req.query;
+		//?throw error if the token is not provided
+		if (!token) {
+			throw new CustomAPIError('Token is required', 400);
+		}
+		//verify the token
+		try {
+			await jwt.verify(token, process.env.RESET_PASSWORD_SECRET);
+			res.render('Pages/update-password', {
+				token: token,
+				success: false,
+				title: 'Reset Password',
+				header: 'Add Your New Password',
+				button: 'Update Password',
+			});
+		}
+		catch (err) {
+			console.log(err);
+			res.render('Errors/403', {
+				layout: 'Errors/Layouts/simple',
+				title: 'Invalid Token',
+				message: 'This Token was expired please enquire for a new one',
+			});
+		}
+	}
+	//ANCHOR update password
+	async updatePassword(req, res) {
+		//?return error if the form validation failed
+		ResultValidation(req);
+		//catch request data
+		const { password, token } = req.body;
+		try{
+			const userModel = await new UserModel();
+			await userModel.updatePassword(token, password);
+			res.render('Pages/update-password', {
+				success: true,
+				title: 'Reset Password',
+			});
+		}
+		catch (err) {
+			console.log(err);
+			res.render('Errors/403', {
+				layout: 'Errors/Layouts/simple',
+				title: 'Invalid Token',
+				message: 'This Token was expired please enquire for a new one',
+			});
+		}
 	}
 	//#!SECTION reset password functionality
 }

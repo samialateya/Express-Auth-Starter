@@ -13,7 +13,7 @@ const CreateRefreshToken = async (userData) => {
 	const refreshToken = jwt.sign(userData, refreshTokenSecret, { expiresIn: '100d' });
 	//* save the refresh token in the database
 	const userModel = await new UserModel();
-	await userModel.updateRefreshToken(userData.id, refreshToken);
+	await userModel.update(userData.id, {refresh_token: refreshToken});
 	return refreshToken;
 }
 

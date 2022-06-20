@@ -90,6 +90,23 @@ class UserModel {
 			throw "token expired";
 		}
 	}
+
+	//*update password
+	async updatePassword(token, password) {
+		//?verify the token to make sure it is not expired
+		const user = await this.findUser('reset_password_token', token);
+		if (!user) throw "token not found";
+		try {
+			await jwt.verify(token, process.env.RESET_PASSWORD_SECRET);
+			//hash the password
+			password = await PasswordHash(password);
+			//remove the token and update verified at to current time
+			await this.update(user.id, { reset_password_token: '', password: password });
+		}
+		catch (err) {
+			throw "token expired";
+		}
+	}
 }
 
 module.exports = UserModel;
