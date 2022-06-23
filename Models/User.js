@@ -72,7 +72,10 @@ class UserModel {
 		const columns = '*';
 		const where = `WHERE ${key} = '${value}'`;
 		const user = await this.#DBClient.fetchData(this.#table, columns, where, '', 'LIMIT 1');
-		return user.rows[0];
+		const userData = user.rows[0];
+		//?append default avatar link if the user dose not have one
+		if (!userData.avatar_link) userData.avatar_link = this.#defaultAvatarLink;
+		return userData;
 	}
 
 	//*verify user email

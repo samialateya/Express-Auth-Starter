@@ -22,6 +22,10 @@ app.set('view engine', 'ejs');
 //authentication routes
 const authRoutes = require('./routes/AuthRoutes');
 app.use('/auth',authRoutes);
+//profile routes
+const profileRoutes = require('./routes/ProfileRoutes');
+app.use('/profile',profileRoutes);
+
 
 /* --------------------------- register Middleware -------------------------- */
 app.use(ErrorHandlerMiddleware);
