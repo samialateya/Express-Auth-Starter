@@ -36,6 +36,19 @@ class ProfileController{
 		//return success response to user
 		return res.status(200).json({ 'message': 'Profile Updated Successfully' });
 	}
+
+	//*update avatar
+	async updateAvatar(req, res){
+		//?return error if the form validation failed
+		ResultValidation(req);
+		upload(req, res, (err) => {
+			if (err) {
+				res.status(400).send("Something went wrong!");
+			}
+			res.send(req.file);
+		});
+		return res.status(200).json({ 'message': 'Profile Updated Successfully' });
+	}
 }
 
 module.exports = ProfileController;
